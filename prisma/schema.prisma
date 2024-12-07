@@ -14,18 +14,19 @@ datasource db {
 }
 
 enum Guarantee {
-  three_months    // 3 meses
-  six_months      // 6 meses
-  twelve_months   // 12 meses
+  three_months // 3 meses
+  six_months // 6 meses
+  twelve_months // 12 meses
 }
 
 enum Status {
   to_receive // "a receber"
-  paid       // "pago"
+  paid // "pago"
 }
 
 model User {
   id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
   email     String   @unique @db.VarChar(255)
   password  String   @db.VarChar(255)
   notes     Note[]
@@ -34,18 +35,18 @@ model User {
 }
 
 model Note {
-  id            Int      @id @default(autoincrement())
-  technicalName String   @db.VarChar(255)
+  id            Int       @id @default(autoincrement())
+  technicalName String    @db.VarChar(255)
   description   String
-  dateOfService DateTime @default(now())
+  dateOfService DateTime  @default(now())
   guarantee     Guarantee
-  price         Decimal? @db.Decimal(10, 2)
-  nameOfClient  String   @db.VarChar(255)
-  clientPhone   String?  @db.VarChar(20)
-  clientAddress String?  @db.VarChar(100)
+  price         Decimal?  @db.Decimal(10, 2)
+  nameOfClient  String    @db.VarChar(255)
+  clientPhone   String?   @db.VarChar(20)
+  clientAddress String?   @db.VarChar(100)
   status        Status?
   userId        Int
-  user          User     @relation(fields: [userId], references: [id])
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  user          User      @relation(fields: [userId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
