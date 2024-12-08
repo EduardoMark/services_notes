@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 const userModel = require("../models/userModel");
+const bcrypt = require("bcrypt");
 
 const userController = {
     getAllUsers: async (req, res) => {
@@ -29,6 +30,35 @@ const userController = {
 
             console.error(error);
             return res.status(500).json({ error: "Erro ao tentar criar o usuário!" });
+        }
+    },
+
+    updateUser: async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).json({ message: errors.array() });
+
+        try {
+            const { id } = req.params;            
+            const { name, email, newPassword, currentPassword } = req.body;
+            if (!name && !email && !newPassword && !currentPassword) return res.status(200).json({ message: "Nenhum dado informado!" });
+
+            const user = await userModel.findUnique(id);
+            if (!user) return res.status(400).json({ message: "Usuário não encontrado!" });
+            console.log(newPassword, user.password);
+            console.log(currentPassword);
+            
+            if (!(user.password === currentPassword)) return res.status(400).json({ message: "Senha atual incorreta!" });
+
+            const data = {};
+            if (name) data.name = name;
+            if (email) data.email = email;
+            if (newPassword) data.password = newPassword;
+
+            await userModel.updateUser(+id, data);
+            return res.status(200).json({ message: "Usuário atualizado com sucesso!" });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: "Erro ao tentar atualizar o usuário!" });
         }
     }
 };
