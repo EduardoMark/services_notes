@@ -25,6 +25,12 @@ const userModel = {
             where: { id },
             data
         })
+    },
+
+    async deleteUser(id) {
+        return await prisma.user.delete({
+            where: { id }
+        });
     }
 }
 

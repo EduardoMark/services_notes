@@ -38,7 +38,7 @@ const userController = {
         if (!errors.isEmpty()) return res.status(400).json({ message: errors.array() });
 
         try {
-            const { id } = req.params;            
+            const { id } = req.params;
             const { name, email, newPassword, currentPassword } = req.body;
             if (!name && !email && !newPassword && !currentPassword) return res.status(200).json({ message: "Nenhum dado informado!" });
 
@@ -46,7 +46,7 @@ const userController = {
             if (!user) return res.status(400).json({ message: "Usuário não encontrado!" });
             console.log(newPassword, user.password);
             console.log(currentPassword);
-            
+
             if (!(user.password === currentPassword)) return res.status(400).json({ message: "Senha atual incorreta!" });
 
             const data = {};
@@ -59,6 +59,23 @@ const userController = {
         } catch (error) {
             console.error(error);
             return res.status(500).json({ error: "Erro ao tentar atualizar o usuário!" });
+        }
+    },
+
+    deleteUser: async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).json({ message: errors.array() });
+
+        try {
+            const { id } = req.params;
+            const user = await userModel.findUnique(id);
+            if (!user) return res.status(400).json({ message: "Usuário não encontrado!" });
+
+            const deletedUser = await userModel.deleteUser(id);
+            return res.status(200).json({ message: "Usuário deletado com sucesso!", user: deletedUser.email });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: "Erro ao tentar deletar o usuário! "});
         }
     }
 };
