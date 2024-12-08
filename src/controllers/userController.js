@@ -21,10 +21,11 @@ const userController = {
         if (!errors.isEmpty()) return res.status(400).json({ message: errors.array() });
 
         try {
+            const hashedPassword = await bcrypt.hash(req.body.password, 10);
+            req.body.password = hashedPassword;
             const newUser = await userModel.createUser(req.body);
 
-            const { name, email } = newUser;
-            return res.status(201).json({ message: "Usuário criado com sucesso!", user: { name, email } });
+            return res.status(201).json({ message: "Usuário criado com sucesso!", user: { name: newUser.name, email: newUser.email } });
         } catch (error) {
             if (error.code === 'P2002') return res.status(400).json({ error: "Email já cadastrado!" });
 
@@ -47,12 +48,15 @@ const userController = {
             console.log(newPassword, user.password);
             console.log(currentPassword);
 
-            if (!(user.password === currentPassword)) return res.status(400).json({ message: "Senha atual incorreta!" });
+            const comparePassword = await bcrypt.compare(currentPassword, user.password);
+            if (!comparePassword) return res.status(400).json({ message: "Senha atual incorreta!" });
+
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
 
             const data = {};
             if (name) data.name = name;
             if (email) data.email = email;
-            if (newPassword) data.password = newPassword;
+            if (newPassword) data.password = hashedPassword;
 
             await userModel.updateUser(+id, data);
             return res.status(200).json({ message: "Usuário atualizado com sucesso!" });
