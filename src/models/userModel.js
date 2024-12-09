@@ -7,9 +7,14 @@ const userModel = {
         return await prisma.user.findMany();
     },
 
-    async findUnique(id) {
+    async findUniqueById(id) {
         return await prisma.user.findUnique({ where: { id } });
     },
+
+    async findUniqueByEmail(email) {
+        return await prisma.user.findUnique({ where: { email } });
+    },
+
     async createUser({ name, email, password }) {
         return await prisma.user.create({
             data: {
