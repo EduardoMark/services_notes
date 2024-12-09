@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 
 const userController = {
     getAllUsers: async (req, res) => {
-        try {
+        try {            
             const users = await userModel.findAll();
 
             if (users.length === 0) return res.status(200).json({ message: "Nenhum usuário encontrado!" });
