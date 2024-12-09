@@ -1,12 +1,5 @@
 const { body, param } = require('express-validator');
 
-const validateId = [
-    param('id')
-        .isInt({ min: 1 })
-        .withMessage('O id precisa ser um número inteiro positivo')
-        .toInt()
-];
-
 const validateUserPostBody = [
     body('name')
         .notEmpty()
@@ -72,7 +65,6 @@ const validateUserPutBody = [
 ];
 
 module.exports = {
-    validateId,
     validateUserPostBody,
     validateUserPutBody
 }
