@@ -38,7 +38,7 @@ model Note {
   id            Int       @id @default(autoincrement())
   technicalName String    @db.VarChar(255)
   description   String
-  dateOfService DateTime  @default(now())
+  dateOfService DateTime  @db.Date @default(now())
   guarantee     Guarantee
   price         Decimal?  @db.Decimal(10, 2)
   nameOfClient  String    @db.VarChar(255)
