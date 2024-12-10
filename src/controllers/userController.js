@@ -89,15 +89,13 @@ const userController = {
     },
 
     deleteUser: async (req, res) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(400).json({ message: errors.array() });
+        const userId = req.userId;
 
         try {
-            const { id } = req.params;
-            const user = await userModel.findUniqueById(id);
-            if (!user) return res.status(400).json({ message: "Usuário não encontrado!" });
+            const user = await userModel.findUniqueById(userId);
+            if (!user) return res.status(404).json({ message: "Usuário não encontrado!" });
 
-            const deletedUser = await userModel.deleteUser(id);
+            const deletedUser = await userModel.deleteUser(userId);
             return res.status(200).json({ message: "Usuário deletado com sucesso!", user: deletedUser.email });
         } catch (error) {
             console.error(error);
