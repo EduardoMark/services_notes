@@ -9,7 +9,7 @@ const userRouter = Router();
 // Users
 userRouter.get('/users', validateJWT, userController.getAllUsers);
 userRouter.post('/users', validateUserPostBody, userController.creteUser);
-userRouter.put('/users/:id', validateId, validateUserPutBody, userController.updateUser);
+userRouter.put('/users', validateJWT, validateUserPutBody, userController.updateUser);
 userRouter.delete('/users/:id', validateId, userController.deleteUser);
 
 // Login

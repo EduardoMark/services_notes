@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 
 const userController = {
     getAllUsers: async (req, res) => {
-        try {            
+        try {
             const users = await userModel.findAll();
 
             if (users.length === 0) return res.status(200).json({ message: "Nenhum usuário encontrado!" });
@@ -41,29 +41,48 @@ const userController = {
         if (!errors.isEmpty()) return res.status(400).json({ message: errors.array() });
 
         try {
-            const { id } = req.params;
-            const { name, email, newPassword, currentPassword } = req.body;
-            if (!name && !email && !newPassword && !currentPassword) return res.status(200).json({ message: "Nenhum dado informado!" });
+            const userId = req.userId;
 
-            const user = await userModel.findUniqueById(id);
-            if (!user) return res.status(400).json({ message: "Usuário não encontrado!" });
-            console.log(newPassword, user.password);
-            console.log(currentPassword);
+            const isEmpty = Object.keys(req.body).length === 0;
+            if (isEmpty) return res.status(400).json({ message: "Nenhuma dado informado!" });
 
-            const comparePassword = await bcrypt.compare(currentPassword, user.password);
-            if (!comparePassword) return res.status(400).json({ message: "Senha atual incorreta!" });
+            const { name, email, currentPassword, newPassword } = req.body;
 
-            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            const user = await userModel.findUniqueById(userId);
+            if (!user) return res.status(404).json({ message: "Usuário não encontrado!" });
+
+            if (newPassword && !currentPassword) return res.status(400).json({ message: "Senha atual obrigatória!" });
+            if (currentPassword && !newPassword) return res.status(400).json({ message: "Nova senha obrigatória!" });
+
+            let hashedPassword;
+            if (newPassword && currentPassword) {
+                const comparePassword = await bcrypt.compare(currentPassword, user.password);
+                if (!comparePassword) return res.status(400).json({ message: "Senha atual incorreta!" });
+
+                hashedPassword = await bcrypt.hash(newPassword, 10);
+            }
+
+            if (email) {
+                const existingUser = await userModel.findUniqueByEmail(email);
+                if (existingUser && existingUser.id !== userId) {
+                    return res.status(400).json({ message: "Email ja cadastrado!" });
+                }
+            }
 
             const data = {};
             if (name) data.name = name;
             if (email) data.email = email;
-            if (newPassword) data.password = hashedPassword;
+            if (hashedPassword) data.password = hashedPassword;
 
-            await userModel.updateUser(+id, data);
+            await userModel.updateUser(userId, data);
             return res.status(200).json({ message: "Usuário atualizado com sucesso!" });
         } catch (error) {
-            console.error(error);
+            // console.error(error);
+            console.error("Erro ao atualizar usuário:", {
+                userId,
+                errorMessage: error.message,
+                stack: error.stack,
+            });
             return res.status(500).json({ error: "Erro ao tentar atualizar o usuário!" });
         }
     },
@@ -92,7 +111,7 @@ const userController = {
             const user = await userModel.findUniqueByEmail(email);
             if (!user) return res.status(400).json({ message: "Email ou senha inválidos!" });
 
-            const comparePassword = await bcrypt.compare(password, user.password);            
+            const comparePassword = await bcrypt.compare(password, user.password);
             if (!comparePassword) return res.status(400).json({ message: "Email ou senha inválidos!" });
 
             const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
