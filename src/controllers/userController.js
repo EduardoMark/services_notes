@@ -5,13 +5,14 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const userController = {
-    getAllUsers: async (req, res) => {
+    getUserData: async (req, res) => {
+        const userId = req.userId;
+
         try {
-            const users = await userModel.findAll();
+            const user = await userModel.findUniqueById(userId);
+            if (!user) return res.status(404).json({ message: "Nenhum usuário encontrado!" });
 
-            if (users.length === 0) return res.status(200).json({ message: "Nenhum usuário encontrado!" });
-
-            return res.status(200).json({ users: users.map(user => ({ id: user.id, name: user.name, email: user.email })) });
+            return res.status(200).json({ user: { name: user.name, email: user.email } });
         } catch (error) {
             console.error(error);
             return res.status(500).json({ error: "Erro ao buscar os usuários!" });

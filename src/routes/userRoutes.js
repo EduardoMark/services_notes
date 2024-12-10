@@ -7,10 +7,10 @@ const validateId = require("../middlewares/validateId");
 const userRouter = Router();
 
 // Users
-userRouter.get('/users', validateJWT, userController.getAllUsers);
+userRouter.get('/users/me', validateJWT, userController.getUserData);
 userRouter.post('/users', validateUserPostBody, userController.creteUser);
-userRouter.put('/users', validateJWT, validateUserPutBody, userController.updateUser);
-userRouter.delete('/users/:id', validateId, userController.deleteUser);
+userRouter.put('/users/me', validateJWT, validateUserPutBody, userController.updateUser);
+userRouter.delete('/users/me', validateJWT, userController.deleteUser);
 
 // Login
 userRouter.post('/login', userController.login);
