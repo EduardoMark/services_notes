@@ -46,11 +46,7 @@ const validateNotePostBody = [
 
     body('status')
         .optional()
-        .isString().withMessage('O status deve ser uma string.'),
-
-    body('userId')
-        .isInt().withMessage('O ID do usuário deve ser um número inteiro.')
-        .notEmpty().withMessage('O ID do usuário é obrigatório.'),
+        .isString().withMessage('O status deve ser uma string.')
 ];
 
 const validateNotePutBody = [

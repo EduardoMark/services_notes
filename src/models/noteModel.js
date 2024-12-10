@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 const noteModel = {
     async findAll(userId) {
         return await prisma.note.findMany({
-            where: {userId}
+            where: { userId }
         })
     },
 
@@ -23,6 +23,12 @@ const noteModel = {
         return await prisma.note.update({
             where: { id },
             data
+        })
+    },
+
+    async delete(id) {
+        return await prisma.note.delete({
+            where: { id }
         })
     }
 };

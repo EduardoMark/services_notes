@@ -10,5 +10,6 @@ const noteRouter = Router();
 noteRouter.get('/notes', validateJWT, noteController.getAllNotes);
 noteRouter.post('/notes', validateJWT, validateNotePostBody, noteController.createNote);
 noteRouter.put('/notes/:id', validateJWT, validateId, validateNotePutBody, noteController.updateNote);
+noteRouter.delete('/notes/:id', validateJWT, validateId, noteController.deleteNote);
 
 module.exports = noteRouter
