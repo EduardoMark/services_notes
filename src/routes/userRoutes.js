@@ -1,8 +1,7 @@
 const { Router } = require("express");
 const userController = require("../controllers/userController");
-const { validateUserPostBody, validateUserPutBody } = require("../middlewares/userValidator");
+const { validateUserPostBody, validateUserPutBody, validateLogin } = require("../middlewares/userValidator");
 const validateJWT = require("../middlewares/validateJWT");
-const validateId = require("../middlewares/validateId");
 
 const userRouter = Router();
 
@@ -13,6 +12,6 @@ userRouter.put('/users/me', validateJWT, validateUserPutBody, userController.upd
 userRouter.delete('/users/me', validateJWT, userController.deleteUser);
 
 // Login
-userRouter.post('/login', userController.login);
+userRouter.post('/login', validateLogin, userController.login);
 
 module.exports = userRouter;

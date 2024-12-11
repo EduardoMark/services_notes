@@ -104,6 +104,9 @@ const userController = {
     },
 
     login: async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).json({ message: errors.array() });
+        
         try {
             const { email, password } = req.body;
 

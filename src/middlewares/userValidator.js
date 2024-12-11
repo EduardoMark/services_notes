@@ -64,7 +64,27 @@ const validateUserPutBody = [
         .escape()
 ];
 
+const validateLogin = [
+    body('name')
+        .notEmpty()
+        .withMessage('O nome não pode ser vazio!')
+        .isString()
+        .isLength({ min: 3, max: 100 })
+        .withMessage('O nome deve ter entre 3 e 100 caracteres')
+        .trim()
+        .escape(),
+
+    body('email')
+        .notEmpty()
+        .withMessage('O email não pode ser vazio!')
+        .isEmail()
+        .withMessage('O email deve ser um email válido')
+        .trim()
+        .escape()
+];
+
 module.exports = {
     validateUserPostBody,
-    validateUserPutBody
+    validateUserPutBody,
+    validateLogin
 }
