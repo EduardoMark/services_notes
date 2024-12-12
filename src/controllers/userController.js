@@ -1,8 +1,8 @@
 require('dotenv').config();
-const { validationResult } = require("express-validator");
 const userModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const validateResult = require('../utils/functions');
 
 const userController = {
     getUserData: async (req, res) => {
@@ -20,8 +20,10 @@ const userController = {
     },
 
     creteUser: async (req, res) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(400).json({ message: errors.array() });
+        const errorMessage = validateResult(req);
+        if (errorMessage) {
+            return res.status(400).json({ errors: errorMessage });
+        }
 
         try {
             const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -38,8 +40,10 @@ const userController = {
     },
 
     updateUser: async (req, res) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(400).json({ message: errors.array() });
+        const errorMessage = validateResult(req);
+        if (errorMessage) {
+            return res.status(400).json({ errors: errorMessage });
+        }
 
         try {
             const userId = req.userId;
@@ -104,9 +108,11 @@ const userController = {
     },
 
     login: async (req, res) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(400).json({ message: errors.array() });
-        
+        const errorMessage = validateResult(req);
+        if (errorMessage) {
+            return res.status(400).json({ errors: errorMessage });
+        }
+
         try {
             const { email, password } = req.body;
 

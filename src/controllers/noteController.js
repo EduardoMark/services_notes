@@ -1,5 +1,4 @@
 const noteModel = require("../models/noteModel");
-const { validationResult } = require('express-validator');
 
 const noteController = {
     getAllNotes: async (req, res) => {
@@ -17,14 +16,21 @@ const noteController = {
     },
 
     createNote: async (req, res) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(400).json({ message: errors.array() });
+        const errorMessage = validateResult(req);
+        if (errorMessage) {
+            return res.status(400).json({ errors: errorMessage });
+        }
 
         const userId = req.userId;
 
         try {
+            const lastNote = await noteModel.findFirst(userId);
+
+            const nextNoteNumber = lastNote ? lastNote.noteNumber + 1 : 1;
+
             const data = {
                 ...req.body,
+                noteNumber: nextNoteNumber,
                 dateOfService: req.body.dateOfService ? new Date(req.body.dateOfService) : new Date(),
                 userId
             };
@@ -39,16 +45,18 @@ const noteController = {
     },
 
     updateNote: async (req, res) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) return res.status(400).json({ message: errors.array() });
+        const errorMessage = validateResult(req);
+        if (errorMessage) {
+            return res.status(400).json({ errors: errorMessage });
+        }
 
-        const { id } = req.params;
+        const { noteNumber } = req.params;
         const userId = req.userId;
 
         try {
-            const note = await noteModel.findUniqueById(id);
+            const note = await noteModel.findByNoteNumber(userId, noteNumber);
 
-            if (!note || note.userId !== userId) return res.status(403).json({ message: "Você não tem permissão para alterar essa nota" });
+            if (!note) return res.status(404).json({ message: "Nota não encontrada!" });
 
             const isEmpty = Object.keys(req.body).length === 0;
             if (isEmpty) return res.status(400).json({ message: "Nenhuma dado informado!" });
@@ -58,7 +66,7 @@ const noteController = {
                 dateOfService: req.body.dateOfService ? new Date(req.body.dateOfService) : new Date()
             };
 
-            const updatedNote = await noteModel.update(id, data);
+            const updatedNote = await noteModel.update(note.id, data);
 
             return res.status(200).json(updatedNote);
         } catch (error) {
@@ -68,16 +76,19 @@ const noteController = {
     },
 
     deleteNote: async (req, res) => {
-        const { id } = req.params;
+        const errorMessage = validateResult(req);
+        if (errorMessage) {
+            return res.status(400).json({ errors: errorMessage });
+        }
+
+        const { noteNumber } = req.params;
         const userId = req.userId;
-                
+
         try {
-            const note = await noteModel.findUniqueById(id);
+            const note = await noteModel.findByNoteNumber(userId, noteNumber);
             if (!note) return res.status(404).json({ message: "Nota não encontrada" });
 
-            if (note.userId !== userId) return res.status(401).json({ message: "Você não tem autorização para acessar essa nota" });
-
-            const deletedNote = await noteModel.delete(id);
+            const deletedNote = await noteModel.delete(note.id);
 
             return res.status(200).json({ message: "Nota deletada com sucesso!", note: deletedNote });
         } catch (error) {

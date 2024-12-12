@@ -2,14 +2,14 @@ const { Router } = require('express');
 const noteController = require('../controllers/noteController');
 const validateJWT = require('../middlewares/validateJWT');
 const { validateNotePostBody, validateNotePutBody } = require('../middlewares/noteValidation');
-const validateId = require('../middlewares/validateId');
+const validateNoteNumber = require('../middlewares/validateNoteNumber');
 
 const noteRouter = Router();
 
 // Notes
 noteRouter.get('/notes', validateJWT, noteController.getAllNotes);
 noteRouter.post('/notes', validateJWT, validateNotePostBody, noteController.createNote);
-noteRouter.put('/notes/:id', validateJWT, validateId, validateNotePutBody, noteController.updateNote);
-noteRouter.delete('/notes/:id', validateJWT, validateId, noteController.deleteNote);
+noteRouter.put('/notes/:noteNumber', validateJWT, validateNoteNumber, validateNotePutBody, noteController.updateNote);
+noteRouter.delete('/notes/:noteNumber', validateJWT, validateNoteNumber, noteController.deleteNote);
 
 module.exports = noteRouter

@@ -9,8 +9,20 @@ const noteModel = {
         })
     },
 
-    async findUniqueById(id) {
-        return await prisma.note.findUnique({ where: { id } });
+    async findFirst(userId) {
+        return await prisma.note.findFirst({
+            where: { userId },
+            orderBy: { noteNumber: 'desc' }
+        })
+    },
+
+    async findByNoteNumber(userId, noteNumber) {
+        return await prisma.note.findFirst({
+            where: {
+                userId,
+                noteNumber
+            },
+        })
     },
 
     async create(data) {
