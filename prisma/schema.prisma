@@ -36,9 +36,10 @@ model User {
 
 model Note {
   id            Int       @id @default(autoincrement())
+  noteNumber    Int       @default(0)
   technicalName String    @db.VarChar(255)
   description   String
-  dateOfService DateTime  @db.Date @default(now())
+  dateOfService DateTime  @default(now()) @db.Date
   guarantee     Guarantee
   price         Decimal?  @db.Decimal(10, 2)
   nameOfClient  String    @db.VarChar(255)
